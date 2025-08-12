@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>My page title</title>
+    <link rel="stylesheet" href="">
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <button onclick="changeHash">changeHash</button>
+    <p class="output">iFrame body</p>
+</body>
+<script>
+    var output = document.querySelector('.output');
+    var thisAppID;
+    var channelPort;
+    window.addEventListener('message', onMessage);
+    window.addEventListener("hashchange", ({
+        oldURL,
+        newURL
+    }) => {
+        channelPort && channelPort.postMessage({
+            appid: thisAppID,
+            oldURL,
+            newURL
+        })
+    });
+
+    function changeHash() {
+        window.location.hash = `/subroute?date=${Date.now()}`;
+    }
+
+    function onMessage(e) {
+        output.innerHTML = e.data;
+        thisAppID = e.data;
+        if (/MessagePort/.test(Object.prototype.toString.call(e.ports && e.ports[0]))) {
+            channelPort = e.ports[0];
+            channelPort.onmessage = e => {
+                output.innerHTML = e.data
+            };
+        }
+    }
+</script>
+
+</html>

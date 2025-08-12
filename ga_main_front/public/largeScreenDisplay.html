@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大屏</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 先引入 Vue -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- 引入 http-vue-loader -->
+    <script src="https://unpkg.com/http-vue-loader"></script>
+    <!-- <script src="../node_modules/vue-seamless-scroll/dist/vue-seamless-scroll.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue-seamless-scroll@latest/dist/vue-seamless-scroll.min.js"></script>
+    <style lang="scss" scoped>
+        @charset "utf-8";
+
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            background: url(../img/lsdImages/bg.png) center top;
+            background-size: cover;
+            color: #6AEAF4;
+            padding-bottom: 30px;
+            min-width: 1200px;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .textNoWrap {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* 超出部分显示省略号 */
+            display: -webkit-box;
+            /*将元素设为盒子伸缩模型显示*/
+            -webkit-box-orient: vertical;
+            /*伸缩方向设为垂直方向*/
+            -webkit-line-clamp: 1;
+            /*超出3行隐藏，并显示省略号*/
+        }
+
+        .head {
+            min-height: 70px;
+            /* height: 10vh; */
+            background: url(../img/lsdImages/head_bg.png) no-repeat center center;
+            background-size: 100% 100%;
+            position: relative;
+            text-align: center;
+
+        }
+
+        .head-title {
+            margin: 0 auto;
+            padding: 10px 0;
+            max-width: 47%;
+        }
+
+        .dateTime {
+            position: absolute;
+            top: 20%;
+            right: 10px;
+            width: auto;
+            min-width: 250px;
+            font-size: 14px;
+            background: rgba(14, 32, 73, 0.9);
+            border-radius: 5px;
+            border: 1px solid rgba(97, 214, 228, 0.2);
+        }
+
+        .dateTime span {
+            /* line-height: 30px; */
+        }
+
+        .statistics-data-num {
+            margin: 10px 0;
+            text-align: center;
+            box-sizing: border-box;
+            color: #fff;
+        }
+
+        .statistics-data-num-list .content {
+            margin: 0 10px;
+            padding: 10px;
+            font-size: 20px;
+
+        }
+
+        .content-row {
+            border-radius: 5px;
+        }
+
+        .statistics-data-num-list .content-col-title {
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .statistics-data-num-list .content-col-num {
+            font-size: 24px;
+            text-align: left;
+            margin-top: 0;
+            font-weight: 600;
+        }
+
+        .real-time-statistics-data {
+            margin: 10px 0;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .real-time-statistics-data .real-time-statistics-data-list {
+            color: #6AEAF4;
+        }
+
+        .real-time-statistics-data .real-time-statistics-data-list .content-box {
+            margin: 10px 20px;
+            background: rgba(14, 32, 73, 0.6);
+            padding-bottom: 10px;
+            box-sizing: border-box;
+            height: 70vh;
+
+        }
+
+        .real-time-statistics-data .real-time-statistics-data-list .content-box .content-box-title {
+            background: url(../img/lsdImages/title_bg.png) no-repeat center center;
+            background-size: 100% 100%;
+            border-radius: 8px 8px 0 0;
+            height: 40px;
+            line-height: 40px;
+        }
+
+        .real-time-statistics-data .real-time-statistics-data-list .content-box .content-box-title span {
+            margin: 0 16px;
+        }
+
+        .real-time-statistics-data .real-time-statistics-data-list .content-box .content-box-team-title {
+            /* background: url(../img/lsdImages/title_bg.png) no-repeat center center;
+            background-size: 100%; */
+            background-color: rgba(15, 106, 129, 0.6);
+            height: 40px;
+            line-height: 40px;
+            font-size: 14px;
+            margin: 10px;
+            margin-bottom: 0;
+        }
+
+        .seamless_warp {
+            overflow: hidden;
+            height: 55vh;
+            font-size: 14px !important;
+            padding: 0 10px 4px 10px;
+        }
+
+        .seamless_warp .seamless-warp-item-bg4 {
+            background: rgba(17, 96, 122, 0.3);
+        }
+
+        .seamless_warp .seamless-warp-item-bg1 {
+            background: rgba(17, 96, 122, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="head">
+            <h1 class="head-title">{{ DPTitle }}</h1>
+            <div class="dateTime">
+                <div>
+                    <span>{{NewTime.dd}}</span>
+                </div>
+                <div>
+                    <span>{{NewTime.week}}</span>
+                </div>
+            </div>
+        </div>
+        <div class="statistics-data-num">
+            <el-row>
+                <el-col v-for='(item, index) in statisticsDataNum' class="statistics-data-num-list" :key="index"
+                    :span="6">
+                    <div class="content">
+                        <el-row type="flex" align="middle" class="content-row"
+                            :style="{'background': `url(${item.bgUrl}) no-repeat center center`}">
+                            <el-col :span="8">
+                                <img :src="item.iconUrl">
+                            </el-col>
+                            <el-col :span="16">
+                                <p class="content-col-title">{{item.title}}</p>
+                                <p class="content-col-num">{{item.num}}</p>
+                            </el-col>
+                        </el-row>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+        <div class="real-time-statistics-data">
+            <el-row>
+                <!-- 班组信息 -->
+                <el-col class="real-time-statistics-data-list" :span="8">
+                    <div class="content-box">
+                        <div class="content-box-title">
+                            <img src="../img/lsdImages/left.png" alt=""><span>班组信息</span><img
+                                src="../img/lsdImages/right.png" alt="">
+                        </div>
+                        <el-row class="content-box-team-title">
+                            <el-col v-for='(item, index) in teamInfoTitle' :span="8" :key="index">
+                                {{item}}
+                            </el-col>
+                        </el-row>
+                        <vue-seamless-scroll v-show='teamInfo.length>0' :data="teamInfo" class="seamless_warp"
+                            ref="seamlessScroll" :class-option="classOption">
+                            <el-row v-for="(item, index) in teamInfo" :key="index"
+                                :class="(index+1)%2==0?'seamless-warp-item-bg4':'seamless-warp-item-bg1'">
+                                <el-col :span="8">
+                                    <el-tooltip :content="item.teamName" placement="top">
+                                        <p class="textNoWrap" style="margin: 0;line-height:40px">
+                                            {{item.teamName}}
+                                        </p>
+                                    </el-tooltip>
+                                </el-col>
+                                <el-col :span="8">
+                                    <p style="margin: 0;line-height:40px">
+                                        {{item.teamLeader}}
+                                    </p>
+                                </el-col>
+                                <el-col :span="8">
+                                    <p style="margin: 0;line-height:40px">
+                                        {{item.sceneWorker}}
+                                    </p>
+                                </el-col>
+                            </el-row>
+                        </vue-seamless-scroll>
+                        <div v-show='teamInfo.length==0' style="line-height: 400px;">
+                            暂无数据
+                        </div>
+                    </div>
+                </el-col>
+                <!-- 工种信息 -->
+                <el-col class="real-time-statistics-data-list" :span="8">
+                    <div class="content-box">
+                        <div class="content-box-title">
+                            <img src="../img/lsdImages/left.png" alt=""><span>工种信息</span><img
+                                src="../img/lsdImages/right.png" alt="">
+                        </div>
+                        <el-row class="content-box-team-title">
+                            <el-col v-for='(item, index) in workerTypeInfoTitle' :span="12" :key="index">
+                                {{item}}
+                            </el-col>
+                        </el-row>
+                        <vue-seamless-scroll v-show='workerTypeInfo.length>0' :data="workerTypeInfo"
+                            class="seamless_warp" ref="seamlessScroll" :class-option="classOption">
+                            <el-row v-for="(item, index) in workerTypeInfo" :key="index"
+                                :class="(index+1)%2==0?'seamless-warp-item-bg4':'seamless-warp-item-bg1'">
+                                <el-col :span="12">
+                                    <p style="margin: 0;line-height:40px">
+                                        {{item.workerTypeName}}
+                                    </p>
+                                </el-col>
+                                <el-col :span="12">
+                                    <p style="margin: 0;line-height:40px">
+                                        {{item.sceneWorker}}
+                                    </p>
+                                </el-col>
+                            </el-row>
+                        </vue-seamless-scroll>
+                        <div v-show='workerTypeInfo.length==0' style="line-height: 400px;">
+                            暂无数据
+                        </div>
+                    </div>
+                </el-col>
+                <!-- 人员信息 -->
+                <el-col class="real-time-statistics-data-list" :span="8">
+                    <div class="content-box">
+                        <div class="content-box-title">
+                            <img src="../img/lsdImages/left.png" alt=""><span>{{inOrOutTitle}}</span><img
+                                src="../img/lsdImages/right.png" alt="">
+                        </div>
+                        <div>
+                            <el-row v-for="(item, index) in inOrOutInfo.slice(0,3)" :key="index"
+                                style="margin-top: 10px;font-size: 14px;">
+                                <el-col :span="6">
+                                    <img :src="item.headImage" width="80" height="110" style="border-radius: 5px;">
+                                </el-col>
+                                <el-col :span="18" style="text-align: left;">
+                                    <p style="margin:10px 0">{{item.name}}</p>
+                                    <p style="margin:10px 0" class="textNoWrap">{{item.company}}</p>
+                                    <p style="margin:10px 0">进出时间：{{item.checkDate}}</p>
+                                </el-col>
+                                <el-col :span="24">
+                                    <div style="width: 97%;margin: 0 auto;border-bottom: 1px solid rgba(55,70,105,1);">
+                                    </div>
+                                </el-col>
+                            </el-row>
+                            <div v-show='inOrOutInfo.length==0' style="line-height: 65vh;">
+                                暂无数据
+                            </div>
+                        </div>
+                    </div>
+                </el-col>
+            </el-row>
+        </div>
+    </div>
+</body>
+
+<!-- 引入element-ui组件库 -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<!-- 引入axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    // 使用httpVueLoader
+    Vue.use(httpVueLoader);
+    Vue.use(vueSeamlessScroll)
+    new Vue({
+        el: '#app',
+        computed: {
+            classOption() {
+                return this.option;
+            },
+        },
+        data: function () {
+            return {
+                DPTitle: '泸州长江六桥及连接线工程和长江滨江路小关门至柏木溪PPP项目',
+                NewTime: this.dateFormat(new Date().getTime()),
+                ws: null,
+                api: "http://118.114.172.211:18007", //金键云服务地址
+                socket: "ws:118.114.172.211:18007", //websocket地址
+                statisticsDataNum: [{
+                        title: '工人总数',
+                        iconUrl: '../img/lsdImages/gongren.png',
+                        bgUrl: '../img/lsdImages/gr_bg.png',
+                        num: 35555
+                    },
+                    {
+                        title: '在场工人',
+                        iconUrl: '../img/lsdImages/daochang.png',
+                        bgUrl: '../img/lsdImages/zc_bg.png',
+
+                        num: 21323
+                    },
+                    {
+                        title: '管理人员',
+                        iconUrl: '../img/lsdImages/xiangmujingliguanli_renyuanguanli.png',
+                        bgUrl: '../img/lsdImages/gl_bg.png',
+
+                        num: 123
+                    },
+                    {
+                        title: '在场管理人员',
+                        iconUrl: '../img/lsdImages/daochang.png',
+                        bgUrl: '../img/lsdImages/zc_bg.png',
+                        num: 22
+                    },
+                ],
+                teamInfoTitle: ['班组名称', '班组长', '在场人数'],
+                teamInfo: [],
+                workerTypeInfoTitle: ['工种', '在场人数'],
+                workerTypeInfo: [],
+                inOrOutTitle: '进出记录',
+                inOrOutInfo: [],
+                CardPartsStatisticsList: [],
+                isSeamlessScroll: true,
+                option: {
+                    step: 0.1, // 数值越大速度滚动越快
+                    limitMoveNum: 10, // 开始无缝滚动的数据量
+                    hoverStop: true, // 是否开启鼠标悬停stop
+                    direction: 1, // 0向下 1向上 2向左 3向右
+                    openWatch: true, // 开启数据实时监控刷新dom
+                    singleHeight: 0, // 单步运动停止的高度(默认值0是无缝不停止的滚动) direction => 0/1
+                    singleWidth: 0, // 单步运动停止的宽度(默认值0是无缝不停止的滚动) direction => 2/3
+                    waitTime: 1000, // 单步运动停止的时间(默认值1000ms)
+                },
+            }
+        },
+        mounted() {
+            setInterval(() => {
+                this.NewTime = this.dateFormat(new Date().getTime())
+            }, 1000)
+            var search = window.location.search;
+            var id = getSearchString('id', search);
+            //key(需要检索的键） url（传入的需要分割的url地址，例：?id=2&age=18）
+            function getSearchString(key, Url) {
+                var str = Url;
+                str = str.substring(1, str.length); // 获取URL中?之后的字符（去掉第一位的问号）
+                // 以&分隔字符串，获得类似name=xiaoli这样的元素数组
+                var arr = str.split("&");
+                var obj = new Object();
+                // 将每一个数组元素以=分隔并赋给obj对象
+                for (var i = 0; i < arr.length; i++) {
+                    var tmp_arr = arr[i].split("=");
+                    obj[decodeURIComponent(tmp_arr[0])] = decodeURIComponent(tmp_arr[1]);
+                }
+                return obj[key];
+            }
+            let getProjectInfo = axios.get(`${this.api}/bigScreen/projectInfo/${id}`)
+                .then((res) => {
+                    if (res.data.code == 0) {
+                        this.DPTitle = res.data.data.projectName
+                        this.statisticsDataNum[0].num = res.data.data.workerTotal
+                        this.statisticsDataNum[1].num = res.data.data.sceneWorker
+                        this.statisticsDataNum[2].num = res.data.data.managerTotal
+                        this.statisticsDataNum[3].num = res.data.data.sceneManager
+                        return 'success'
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            let getTeamInfo = axios.get(`${this.api}/bigScreen/teamInfo/${id}`)
+                .then((res) => {
+                    if (res.data.code == 0) {
+                        this.teamInfo = res.data.data
+                        return 'success'
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            let getWorkerTypeInfo = axios.get(
+                    `${this.api}/bigScreen/workerTypeInfo/${id}`)
+                .then((res) => {
+                    if (res.data.code == 0) {
+                        this.workerTypeInfo = res.data.data
+                        return 'success'
+                    }
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            Promise.all([getProjectInfo, getTeamInfo, getWorkerTypeInfo])
+                .then((res) => {
+                    if (res.indexOf(undefined) == -1) {
+                        console.log('获取了全部数据');
+                    }
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+            this.websocket(id)
+            // this.isSeamlessScrollFn();
+            // this.CardPartsStatisticsList = this.homeCardInfo.content;
+            setTimeout(() => {
+                // this.isSeamlessScrollFn();
+                // this.CardPartsStatisticsList = this.homeCardInfo.content;
+                // CardPartsStatisticsList length无变化，仅仅是属性变更，手动调用下组件内部的reset方法
+                this.$refs.seamlessScroll.reset();
+            }, 100);
+        },
+        beforeDestroy() {
+            this.ws.close();
+        },
+        methods: {
+            websocket(id) {
+                //建立socket通道
+                //process.env.VUE_APP_URL为服务端地址
+                //code为自定义的参数，主要是用于服务端标识当前会话是哪个用户
+                this.ws = new WebSocket(
+                    `${this.socket}/api/websocket/${id}`
+                );
+                //socket连接成功后的回调函数
+                this.ws.onopen = () => {
+                    console.log('websocket连接成功！');
+                    //若项目中没有使用nginx转发请求则忽略这步
+                    //设置定时器，每过55秒传一次数据
+                    //以防长时间不通信被nginx自动关闭会话
+                    //也可以通过修改nginx配置文件延长关闭时间
+                    setInterval(() => {
+                        this.keepAlive(this.ws);
+                    }, 6000 * 100);
+                };
+                //接收来自服务端消息的回调函数
+                this.ws.onmessage = evt => {
+                    if (evt.data == '连接成功！') {
+                        console.log('websocket返回的数据：', evt);
+                    } else {
+                        var kqInfo = JSON.parse(evt.data)
+                        kqInfo.checkDate = this.getLocalTime(kqInfo.checkDate)
+                        this.inOrOutInfo.unshift(kqInfo)
+                    }
+                };
+                //关闭socket的回调函数
+                this.ws.onclose = () => {
+                    // 关闭 websocket
+                    console.log('连接已关闭...');
+                };
+            },
+            dateFormat(val) {
+                if (val != null) {
+                    val = val.toString()
+                    var date = new Date(parseInt(val.replace("/Date(", "").replace(")/", ""), 10));
+                    //月份为0-11，所以+1，月份小于10时补个0
+                    var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+                    var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+                    var hour = date.getHours() == 0 ? "00" : date.getHours() < 10 ? `0${date.getHours()}` :
+                        date.getHours();
+                    var minute = date.getMinutes() == 0 ? "00" : date.getMinutes() < 10 ?
+                        `0${date.getMinutes()}` :
+                        date.getMinutes();
+                    var second = date.getSeconds() == 0 ? "00" : date.getSeconds() < 10 ?
+                        `0${date.getSeconds()}` :
+                        date.getSeconds();
+                    var week = ''
+                    switch (date.getDay()) {
+                        case 0:
+                            week = "星期日";
+                            break;
+                        case 1:
+                            week = "星期一";
+                            break;
+                        case 2:
+                            week = "星期二";
+                            break;
+                        case 3:
+                            week = "星期三";
+                            break;
+                        case 4:
+                            week = "星期四";
+                            break;
+                        case 5:
+                            week = "星期五";
+                            break;
+                        case 6:
+                            week = "星期六";
+                    }
+                    var dd = `${date.getFullYear()}-${month}-${currentDate} ${hour}:${minute}:${second}`
+                    return {
+                        dd,
+                        week
+                    };
+                }
+
+                return "";
+            },
+            getLocalTime(nS) {
+                var date = new Date(parseInt(nS))
+                var hour = date.getHours() == 0 ? "00" : date.getHours() < 10 ? `0${date.getHours()}` : date
+                    .getHours()
+                var minute = date.getMinutes() == 0 ? "00" : date.getMinutes() < 10 ? `0${date.getMinutes()}` :
+                    date.getMinutes()
+                var second = date.getSeconds() == 0 ? "00" : date.getSeconds() < 10 ? `0${date.getSeconds()}` :
+                    date.getSeconds()
+                return `${hour}:${minute}:${second}`
+            },
+            //持续向后台发送消息，用于维护socket通道不被nginx关闭  
+            keepAlive(webSocket) {
+                if (webSocket) {
+                    if (webSocket.readyState == webSocket.OPEN) {
+                        webSocket.send('');
+                    }
+                }
+            },
+            isSeamlessScrollFn() {
+                if (this.homeCardInfo.content.length < 6) {
+                    this.isSeamlessScroll = false;
+                } else {
+                    this.isSeamlessScroll = true;
+                }
+            },
+            resetSeamlessScroll() {
+                this.isSeamlessScrollFn();
+                this.CardPartsStatisticsList = this.homeCardInfo.content;
+                this.$refs.seamlessScroll.reset();
+            },
+        }
+
+    })
+</script>
+
+</html>

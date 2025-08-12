@@ -1,0 +1,23 @@
+export const defaultFormQueryData = {
+${pk.attrname}: ""
+};
+
+export const defaultFormData = {
+#foreach($column in $columns)
+    ${column.attrname}: ""#if($velocityCount != $columns.size()),#end
+#end
+}
+
+export let state = {
+  state: {
+    formQueryData: {
+...defaultFormQueryData
+},
+formData: {
+...defaultFormData
+}
+},
+getters: {},
+mutations: {},
+actions: {}
+};

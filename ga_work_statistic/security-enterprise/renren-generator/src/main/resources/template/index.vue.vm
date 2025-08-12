@@ -1,0 +1,108 @@
+<template>
+  <MainPage :configs="configsMainPage">
+    <div v-show="currentView==='main'" class="view mod-${moduleName}__${pathName}">
+      <CFormQuery v-model="formDataQuery" :configs="configsCFormQuery" @query="getTableList"/>
+        <Card>
+          <div class="option-btn-wrapper">
+            <BtnGroup :configs="configsBtns" :can-delete="dataListSelections"/>
+          </div>
+          <el-table v-loading="dataListLoading" :data="dataList" border style="width: 100%;" @selection-change="dataListSelectionChangeHandle">
+            <!-- 选择列 -->
+            <TableColumn v-bind="{type:'selection',headerAlign:'center',align:'center',width:50}"/>
+            <!-- 业务列 -->
+            <TableColumn v-for="(header) in DSLTableHeader" :key="header.prop" :configs="header"/>
+            <!-- 固定列 -->
+            <TableColumn v-slot="{ scope }" v-bind="{label:$t('handle'),fixed:'right',align:'center',width:150}">
+              <BtnGroup :configs="configsListBtns" :scope="scope"/>
+            </TableColumn>
+          </el-table>
+          <Paginationbar v-model="pageInfo" @query="query"/>
+        </Card>
+    </div>
+    <!-- 弹窗, 新增 / 修改 -->
+    <ViewSub v-if="currentView === 'add'" ref="addOrUpdate" :current-view="currentView" @refreshDataList="getTableList" />
+    <ViewSub v-if="currentView === 'update'" ref="addOrUpdate" :current-view="currentView" @refreshDataList="getTableList" />
+  </MainPage>
+</template>
+
+<script>
+/* 混入基类方法 */
+import mixinsBasePage from "@/mixins/basePage";
+import mixinsMainPage from "@/mixins/mainPage";
+/* 应用状态和页面描述信息 */
+import { state, defaultFormQueryData } from "./state";
+import { DSLFormItemsQuery, DSLTableHeader, MODULE_BASE_URL } from "./dsl.js";
+import { BTN_TYPE, BTN_GROUP_TYPE } from "@/components/Types";
+/* 组件 */
+import ViewSub from "./ViewSub";
+
+/*模块名*/
+const moduleName = "${moduleName}-${classname}-${classname}";
+
+export default {
+  components: { ViewSub },
+  mixins: [mixinsBasePage, mixinsMainPage],
+  data() {
+    var _this = this;
+    return {
+      moduleName,
+      formDataQuery: { ...defaultFormQueryData },
+      /*列表外操作*/
+      configsBtns: {
+        btnType: BTN_GROUP_TYPE.Btn,
+        btnList: [
+          {
+            type: BTN_TYPE.export,
+            text: _this.$t("export"),
+            click: () => _this.exportHandle()
+          },
+          {
+            type: BTN_TYPE.add,
+            shiro: "${moduleName}:${pathName}:save",
+            text: _this.$t("add"),
+            click: () => _this.goSub({v:"add"})
+          },
+          {
+            type: BTN_TYPE.delete,
+            shiro: "${moduleName}:${pathName}:delete",
+            text: _this.$t("deleteBatch"),
+            click: () => _this.deleteBy()
+          }
+        ]
+      },
+      /*列表内操作按钮*/
+      configsListBtns: {
+        btnType: BTN_GROUP_TYPE.Btnmini,
+        btnList: [
+          {
+            type: BTN_TYPE.update,
+            shiro: "${moduleName}:${pathName}:update",
+            text: _this.$t("update"),
+            click: scope => _this.goSub({ v: "update", id: scope.row.${pk.attrname} })
+          },
+          {
+            type: BTN_TYPE.delete,
+            shiro: "${moduleName}:${pathName}:delete",
+            text: _this.$t("delete"),
+            click: scope => _this.deleteBy(scope.row.${pk.attrname})
+          }
+        ]
+      },
+      configsMainPage: { moduleName, state, shiro: "${moduleName}:${pathName}:page",},
+      configsCFormQuery: {
+        moduleName,
+        DSLFormItems: DSLFormItemsQuery //查询表单的查询项描述
+      },
+      DSLTableHeader,
+      moduleOptions: {
+        getDataListURL: MODULE_BASE_URL+"/page",
+        getDataListIsPage: true,
+        exportURL: MODULE_BASE_URL+"/export",
+        deleteURL: MODULE_BASE_URL,
+        deleteIsBatch: true,
+        deleteIsBatchKey: "${pk.attrname}"
+      },
+    };
+  }
+};
+</script>

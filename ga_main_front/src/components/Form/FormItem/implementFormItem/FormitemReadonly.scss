@@ -1,0 +1,31 @@
+$color-border: #b2b5bb;
+
+.item__label {
+    vertical-align: middle;
+    font-size: 14px;
+    color: #606266;
+    line-height: 40px;
+    padding: 0 12px 0 0;
+    box-sizing: border-box;
+  }
+
+  .in-form-readonly{
+      &::after{
+          content:" ";
+          position: absolute;
+          border-bottom: 1px solid $color-border;
+          bottom: 10px;
+          right: 0;
+          left: 0;
+      }
+      &.textarea-readonly{
+        &::after{
+            content:" ";
+            position: absolute;
+            border-bottom: 1px solid transparent;
+            bottom: 10px;
+            right: 0;
+            left: 0;
+        }
+      }
+  }

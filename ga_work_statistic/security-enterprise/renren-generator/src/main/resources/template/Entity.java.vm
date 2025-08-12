@@ -1,0 +1,53 @@
+package ${package}.modules.${moduleName}.entity;
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import ${package}.common.entity.BaseEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+#if(${hasBigDecimal})
+import java.math.BigDecimal;
+#end
+import java.util.Date;
+
+/**
+ * ${comments}
+ *
+ * @author ${author} ${email}
+ * @since ${version} ${date}
+ */
+@Data
+@EqualsAndHashCode(callSuper=false)
+@TableName("${tableName}")
+public class ${className}Entity  {
+	private static final long serialVersionUID = 1L;
+
+#foreach ($column in $columns)
+#if($column.columnName != 'id' && $column.columnName != 'CREATOR' && $column.columnName != 'CREATE_DATE' && $column.columnName != 'UPDATER' && $column.columnName != 'UPDATE_DATE')
+    /**
+     * $column.comments
+     */
+	private $column.attrType $column.attrname;
+#end
+#end
+	/**
+     * 创建者
+     */
+	@TableField(fill = FieldFill.INSERT)
+	private Long  creator;
+	/**
+     * 创建时间
+     */
+	@TableField(fill = FieldFill.INSERT)
+	private Date createDate;
+	/**
+	 * 更新者
+	 */
+	@TableField(fill = FieldFill.INSERT_UPDATE)
+	private Long updater;
+	/**
+	 * 更新时间
+	 */
+	@TableField(fill = FieldFill.INSERT_UPDATE)
+	private Date updateDate;
+}

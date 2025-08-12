@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.enterprise.bcp11.dao.BCp11Dao">
+
+    <resultMap type="io.renren.modules.enterprise.bcp11.entity.BCp11Entity" id="bCp11Map">
+        <result property="cp1101" column="CP1101"/>
+        <result property="impdate" column="IMPDATE"/>
+        <result property="importnumber" column="IMPORTNUMBER"/>
+        <result property="successnumber" column="SUCCESSNUMBER"/>
+        <result property="failnumber" column="FAILNUMBER"/>
+        <result property="userId" column="USER_ID"/>
+        <result property="result" column="RESULT"/>
+        <result property="creator" column="CREATOR"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="updater" column="UPDATER"/>
+        <result property="updateDate" column="UPDATE_DATE"/>
+    </resultMap>
+
+    <select id="selectDictData" resultType="java.lang.String">
+        select b.dict_value
+        from SYS_DICT_TYPE a, SYS_DICT_DATA b
+        where a.id = b.dict_type_id
+          and a.dict_type = #{dictType}
+    </select>
+
+</mapper>

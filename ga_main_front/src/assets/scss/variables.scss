@@ -1,0 +1,57 @@
+
+$font-size-l:16px;
+$font-size-m:14px;
+$font-size-b:12px;
+
+// Base
+$base--line-height: 1.15;
+
+// Navbar
+$navbar--height: 64px;
+
+// 变量
+@import "../../element-ui/theme-variables.scss";
+
+// Sidebar
+$sidebar--width: 230px;
+$sidebar--width-fold: 64px;
+$sidebar--background-color-dark: #263238;
+$sidebar--text-color-dark: #8a979e;
+$sidebar--menu-item-height: 48px;
+
+// Content
+$content--padding: 15px; 
+$content--background-color: #f1f4f5;
+$content--card-header-height: 60px;
+$content--tabs-header-height: 38px;
+// Content, 填充整屏高度(非tabs状态) = 整屏高度 - 导航条高度 - app-content上下内边距高度
+$content--fill-height: calc(100vh - #{$navbar--height} - #{$content--padding * 2});
+// Content, 填充整屏高度(是tabs状态) = 整屏高度 - 导航条高度 - tabs组件header高度 - tabs组件content上下内边距高度
+$content--fill-height-tabs: calc(100vh - #{$navbar--height} - #{$content--tabs-header-height} - #{$content--padding * 2});
+
+
+$color-btn-query: #306193;
+$color-btn-add: #409eff;
+$color-btn-update: #4eb11e;
+$color-btn-view: #0b9bb8;
+$color-btn-delete: #d64e4e;
+$color-btn-close: #e6a23c;
+$color-btn-export: #909399;
+$color-red:#ff4240;
+
+
+@mixin btn($color) {
+    color: white;
+    background-color: $color;
+    border-color: transparent;
+    transition: .3s ease-in-out;
+
+    &:hover {
+        color: $color;
+        background-color: white;
+        border-color: $color;
+        @include elevation2;
+    }
+}
+
+$color-link: #006dd9;

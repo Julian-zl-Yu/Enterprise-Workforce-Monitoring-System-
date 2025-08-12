@@ -1,0 +1,119 @@
+{
+  "name": "gkcloud",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build --modern",
+    "lint": "vue-cli-service lint --fix",
+    "build:old": "vue-cli-service build",
+    "build:prod": "vue-cli-service build --mode production",
+    "build:sit": "vue-cli-service build --mode production.sit",
+    "build:uat": "vue-cli-service build --mode production.uat",
+    "et": "node_modules/.bin/et",
+    "et:init": "node_modules/.bin/et -i",
+    "et:list": "gulp themes",
+    "start": "npm run serve",
+    "test:unit": "jest --watchAll"
+  },
+  "dependencies": {
+    "@ventose/utils-loadjs": "0.0.3",
+    "animate.css": "^4.1.1",
+    "async-validator": "^3.5.0",
+    "axios": "^0.19.0",
+    "dayjs": "^1.9.6",
+    "echarts": "^4.9.0",
+    "element-theme": "^2.0.1",
+    "element-ui": "^2.14.1",
+    "jquery": "^3.5.1",
+    "js-cookie": "^2.2.0",
+    "jsstore": "^3.10.4",
+    "lodash": "^4.17.20",
+    "qs": "^6.9.4",
+    "quill": "^1.3.6",
+    "screenfull": "^4.2.1",
+    "vue": "^2.6.12",
+    "vue-baidu-map": "^0.21.22",
+    "vue-cron": "^1.0.9",
+    "vue-drag-drop": "^1.1.4",
+    "vue-fragment": "^1.5.1",
+    "vue-i18n": "^8.22.1",
+    "vue-router": "^3.4.9",
+    "vue-seamless-scroll": "^1.1.23",
+    "vue-virtual-scroll-list": "^2.3.1",
+    "vue2-waterfall": "^3.0.1",
+    "vuex": "^3.5.1"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.12.1",
+    "@types/jest": "^24.0.19",
+    "@types/jquery": "^3.5.4",
+    "@types/js-cookie": "^2.2.6",
+    "@types/lodash": "^4.14.165",
+    "@typescript-eslint/eslint-plugin": "^2.33.0",
+    "@typescript-eslint/parser": "^2.34.0",
+    "@vue/cli-plugin-babel": "^4.5.8",
+    "@vue/cli-plugin-eslint": "^4.5.8",
+    "@vue/cli-plugin-pwa": "^4.5.8",
+    "@vue/cli-plugin-typescript": "^4.5.8",
+    "@vue/cli-plugin-unit-jest": "^4.5.8",
+    "@vue/cli-service": "^4.5.8",
+    "@vue/eslint-config-typescript": "^5.0.2",
+    "@vue/test-utils": "1.0.0-beta.31",
+    "babel-eslint": "^10.1.0",
+    "babel-helper-vue-jsx-merge-props": "^2.0.3",
+    "babel-plugin-component": "^1.1.1",
+    "babel-plugin-syntax-jsx": "^6.18.0",
+    "babel-plugin-transform-vue-jsx": "^3.7.0",
+    "babel-preset-env": "^1.7.0",
+    "cross-env": "^7.0.2",
+    "element-theme-chalk": "^2.14.1",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "fs-extra": "^9.0.1",
+    "gulp-autoprefixer": "^6.1.0",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-load-plugins": "^2.0.5",
+    "gulp-rename": "^1.4.0",
+    "gulp-sass": "^4.0.2",
+    "less-loader": "^6.2.0",
+    "lint-staged": "^9.5.0",
+    "markdown-it-vue": "^1.1.4",
+    "monaco-editor": "^0.20.0",
+    "raw-loader": "^4.0.2",
+    "sass": "^1.30.0",
+    "sass-loader": "^10.1.0",
+    "style-resources-loader": "^1.3.3",
+    "svg-sprite-loader": "^4.3.0",
+    "ts-jest": "^26.4.4",
+    "typescript": "^3.9.7",
+    "vue-cli-plugin-element": "^1.0.1",
+    "vue-template-compiler": "^2.6.12"
+  },
+  "element-theme": {
+    "config": "./src/element-ui/theme-variables.scss",
+    "out": "./src/element-ui/theme",
+    "minimize": true,
+    "browsers": [
+      "last 2 Chrome versions"
+    ]
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts",
+      "vue"
+    ],
+    "transform": {
+      "^.+\\.ts$": "ts-jest",
+      ".*\\.(vue)$": "vue-jest"
+    },
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    },
+    "snapshotSerializers": [
+      "jest-serializer-vue"
+    ]
+  }
+}

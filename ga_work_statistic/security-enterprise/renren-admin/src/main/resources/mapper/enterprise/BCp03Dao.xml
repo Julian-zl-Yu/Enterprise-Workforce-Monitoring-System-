@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.enterprise.bcp03.dao.BCp03Dao">
+
+    <resultMap type="io.renren.modules.enterprise.bcp03.entity.BCp03Entity" id="bCp03Map">
+        <result property="cp0301" column="CP0301"/>
+        <result property="cp0101" column="CP0101"/>
+        <result property="useController" column="USE_CONTROLLER"/>
+        <result property="useOrdWorker" column="USE_ORD_WORKER"/>
+        <result property="useTechWorker" column="USE_TECH_WORKER"/>
+        <result property="useSkillWorker" column="USE_SKILL_WORKER"/>
+        <result property="lackController" column="LACK_CONTROLLER"/>
+        <result property="lackOrdWorker" column="LACK_ORD_WORKER"/>
+        <result property="lackTechWorker" column="LACK_TECH_WORKER"/>
+        <result property="lackSkillWorker" column="LACK_SKILL_WORKER"/>
+        <result property="creator" column="CREATOR"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="updater" column="UPDATER"/>
+        <result property="updateDate" column="UPDATE_DATE"/>
+        <result property="yearMonth" column="YEAR_MONTH"/>
+        <result property="examineStatus" column="EXAMINE_STATUS"/>
+    </resultMap>
+
+    <select id="listByYM" resultType="io.renren.modules.enterprise.bcp03.dto.BCp03DTO">
+        select * from b_cp03 a
+        where a.year_month=#{yearMonth}
+        and a.cp0101=#{cp0101}
+    </select>
+
+    <select id="getList" resultType="io.renren.modules.enterprise.bcp03.dto.BCp03DTO">
+        select aa.*
+        from (select a.corpname,a.areacode, a.dept_id, b.*,
+                     (b.USE_CONTROLLER+b.USE_ORD_WORKER+b.USE_TECH_WORKER+b.USE_SKILL_WORKER) allUseWorker,
+                     (b.LACK_CONTROLLER+b.LACK_ORD_WORKER+b.LACK_TECH_WORKER+b.LACK_SKILL_WORKER) allLackWorker
+              from b_cp01 a, b_cp03 b
+              where a.cp0101 = b.cp0101) aa,
+             (select c.id
+              from sys_dept c
+              where 1=1
+                <if test="deptId!=null and deptId!=''">
+                    and c.pids like concat('%',#{deptId},'%')
+                </if>
+                <if test="deptIdSelf!=null and deptIdSelf!=''">
+                    and c.id = #{deptIdSelf}
+                </if>
+              ) bb
+        where aa.dept_id = bb.id
+        <if test="corpname!=null and corpname!=''">
+            and aa.corpname like concat('%',#{corpname},'%')
+        </if>
+        <if test="examineStatus!=null and examineStatus!=''">
+            and aa.examine_status=#{examineStatus}
+        </if>
+        <if test="areacode!=null and areacode!=''">
+            and aa.areacode like concat(#{areacode},'%')
+        </if>
+        <if test="yearMonth!=null and yearMonth!=''">
+            and aa.year_month=#{yearMonth}
+        </if>
+        order by str_to_date(aa.year_Month,'yyyy-mm') desc
+
+
+    </select>
+
+    <select id="echart" resultType="io.renren.modules.enterprise.bcp03.dto.BCp03DTO">
+        select m.mon yearMonth,
+        <!--       nvl(tt.use_controller, 0) useController,
+                 nvl(tt.use_ord_worker, 0)useOrdWorker,
+                nvl(tt.use_tech_worker, 0)useTechWorker,
+                nvl(tt.use_skill_worker, 0)useSkillWorker,
+               nvl(tt.lack_controller, 0) lackController,
+                 nvl(tt.lack_ord_worker, 0)lackOrdWorker,
+                nvl(tt.lack_tech_worker, 0)lackTechWorker,
+               nvl(tt.lack_skill_worker, 0)lackSkillWorker -->
+                       IF(tt.use_controller IS NULL, '0', tt.use_controller) useController,
+                       IF(tt.use_ord_worker IS NULL, '0', tt.use_ord_worker) useOrdWorker,
+                       IF(tt.use_tech_worker IS NULL, '0', tt.use_tech_worker) useTechWorker,
+                       IF(tt.use_skill_worker IS NULL, '0', tt.use_skill_worker) useSkillWorker,
+                       IF(tt.lack_controller IS NULL, '0', tt.lack_controller) lackController,
+                       IF(tt.lack_ord_worker IS NULL, '0', tt.lack_ord_worker) lackOrdWorker,
+                       IF(tt.lack_tech_worker IS NULL, '0', tt.lack_tech_worker) lackTechWorker,
+                       IF(tt.lack_skill_worker IS NULL, '0', tt.lack_skill_worker) lackSkillWorker
+                from (
+        <!--             SELECT TO_CHAR(ADD_MONTHS(SYSDATE, -LEVEL + 1), 'yyyy-MM') mon
+                 FROM dual
+                 CONNECT BY LEVEL &lt; 7 -->
+                         SELECT
+                             DATE_FORMAT( @cdate := DATE_ADD( @cdate, INTERVAL - 1 MONTH ), '%Y-%m' ) mon,
+                             0 AS alarmDeviceNum
+                         FROM
+                                 ( SELECT @cdate := DATE_ADD( CURDATE(), INTERVAL 1 MONTH ) FROM b_cp01 LIMIT 12 ) t1
+                     ) m
+                left join (select * from b_cp03 t where t.cp0101 = #{cp0101}) tt
+                on m.mon = tt.year_month
+                order by m.mon
+            </select>
+
+            <select id="getThisMonthData" parameterType="java.lang.String" resultType="io.renren.modules.enterprise.bcp03.dto.BCp03DTO">
+                select a.industry,a.estate,a.areacode,a.scale,t.*,
+                       t.use_controller + t.use_ord_worker + t.use_tech_worker +
+                       t.use_skill_worker allUseWorker,
+                       t.lack_controller + t.lack_ord_worker + t.lack_tech_worker +
+                       t.lack_skill_worker allLackWorker
+                from B_CP03 t,b_cp01 a
+                where t.cp0101=a.cp0101
+                  and t.year_month = #{ym}
+                  and a.ABLESTATUS = '1'
+                  and a.dept_id in (select b.id from sys_dept b where b.pids like '%'||#{deptId}||'%')
+            </select>
+
+            <select id="getLackWorkerData" parameterType="java.lang.String" resultType="io.renren.modules.enterprise.bcp03.dto.BCp03DTO">
+                select a.industry,a.estate,a.areacode,a.scale,t.*,
+                       t.use_controller + t.use_ord_worker + t.use_tech_worker +
+                       t.use_skill_worker allUseWorker,
+                       t.lack_controller + t.lack_ord_worker + t.lack_tech_worker +
+                       t.lack_skill_worker allLackWorker
+                from B_CP03 t,b_cp01 a
+                where t.cp0101=a.cp0101
+                  and t.year_month = #{ym}
+                  and a.ABLESTATUS = '1'
+                  and a.dept_id in (select b.id from sys_dept b where b.pids like '%'||#{deptId}||'%')
+            </select>
+
+            <select id="selectYearMonthData" resultType="io.renren.modules.enterprise.bcp03tj.dto.YearMonthDto">
+                select a.year_month,sum(a.alluse) allUseWorker from
+                    (select t.cp0101,
+                            t.year_month,
+                            t.use_controller + t.use_ord_worker + t.use_tech_worker +
+                            t.use_skill_worker as allUse
+                     from B_CP03 t,b_cp01 b
+                        where t.cp0101=b.cp0101 and b.ABLESTATUS = '1' and t.year_month like #{year}||'%' or t.year_month='lastYearMonth') a
+                group by a.year_month
+                order by a.year_month
+            </select>
+
+            <select id="selectIndustryList" resultType="java.lang.String">
+                select b.dict_label
+                from SYS_DICT_TYPE a, SYS_DICT_DATA b
+                where a.id = b.dict_type_id
+                  and a.dict_name = '行业'
+                order by to_number(b.dict_value)
+            </select>
+
+            <select id="getInfo" parameterType="java.lang.Long" resultType="io.renren.modules.enterprise.bcp03.dto.BCp03DTO">
+                select b.*, a.corpname, a.areacode, a.industry, a.estate
+                from B_CP01 a, b_cp03 b
+                where a.cp0101 = b.cp0101
+                  and b.cp0301 =#{id}
+            </select>
+
+            <select id="hasData"  resultType="java.lang.Long">
+                select count(1)
+                from B_CP03 t
+                where t.cp0101 = #{cp0101}
+                  and t.year_month = #{yearMonth}
+            </select>
+
+            <select id="homePageByRegion" resultType="io.renren.modules.enterprise.bcp03.dto.HomePageByRegionDTO">
+                select b.name as name, a.count as value
+                from (select substring(t.areacode, 1, 6) areacode, count(1) count
+                      from B_CP01 t,
+                          (select b.id
+                          from sys_dept b
+                          where b.pids like '%'||#{deptId}||'%'
+                          ) c
+                      where c.id=t.dept_id and t.areacode is not null and t.ABLESTATUS = '1'
+                      group by substring(t.areacode, 1, 6)) a,
+                     SYS_REGION b
+                where a.areacode = b.id
+            </select>
+
+            <select id="homePageByEstate" resultType="io.renren.modules.enterprise.bcp03.dto.HomePageByRegionDTO">
+                select d.dict_label as name, a.count as value
+                from (select t.estate estate, count(1) count
+                    from B_CP01 t,
+                    (select b.id
+                    from sys_dept b
+                    where b.pids like '%'||#{deptId}||'%'
+                    ) c
+                    where c.id=t.dept_id and t.areacode is not null and t.ABLESTATUS = '1'
+                    group by t.estate) a,
+                    Sys_Dict_Data d
+                where a.estate = d.dict_value and d.dict_type_id=1607282147778260993
+            </select>
+
+            <select id="homePageByYear" resultType="io.renren.modules.enterprise.bcp03.dto.HomePageByRegionDTO">
+                select a.year_month name,sum(a.alluse) as value from
+                    (select t.cp0101,
+                            t.year_month,
+                            t.use_controller + t.use_ord_worker + t.use_tech_worker +
+                            t.use_skill_worker as allUse
+                     from B_CP03 t,
+                          (select b.id
+                           from sys_dept b
+                           where b.pids like '%'||#{deptId}||'%'
+                          ) c,
+                          b_cp01 d
+                    where c.id=d.dept_id and d.ABLESTATUS = '1' and d.cp0101=t.cp0101 and t.year_month like concat(#{year},'%') or t.year_month='lastYearMonth') a
+                group by a.year_month
+                order by a.year_month
+            </select>
+
+            <select id="selectByIndustry" resultType="io.renren.modules.enterprise.bcp03tj.dto.ByIndustryDto">
+               WITH t AS (
+                  SELECT
+                    d.industryL industry,
+                    a1.nowcount cpCount,
+                    a1.nowtotal nowWorkerCount,
+                    a2.lasttotal preWorkerCount,
+                    (a1.nowtotal - a2.lasttotal) changeWorkerCount,
+                    ((a1.nowtotal - a2.lasttotal) / a2.lasttotal) changeWorkerRange,
+                    a3.beginyeartotal beginWorkerCount,
+                    (a1.nowtotal - a3.beginyeartotal) changeWorkerCountCompareBeginYear,
+                    ((a1.nowtotal - a3.beginyeartotal) / a3.beginyeartotal) changeWorkerRangeCompareBeginYear
+                  FROM
+                    (SELECT DICT_VALUE industryV, DICT_LABEL industryL FROM sys_dict_data WHERE DICT_TYPE_ID = 1605837416351305730 ORDER BY (DICT_VALUE + 0)) d,
+                    (
+                      SELECT
+                        a.INDUSTRY,
+                        count(1) nowcount,
+                        (
+                          sum(b.USE_CONTROLLER) + sum(b.USE_ORD_WORKER) + sum(b.USE_TECH_WORKER) + sum(b.USE_SKILL_WORKER)
+                        ) nowtotal
+                      FROM
+                        b_cp01 a,
+                        b_cp03 b
+                      WHERE
+                        a.CP0101 = b.CP0101
+                        AND b.`YEAR_MONTH` = #{ym}
+                      GROUP BY
+                        a.INDUSTRY
+                      ORDER BY
+                        (a.INDUSTRY + 0)
+                    ) a1,
+                    (
+                      SELECT
+                        a.INDUSTRY,
+                        count(1),
+                        (
+                          sum(b.USE_CONTROLLER) + sum(b.USE_ORD_WORKER) + sum(b.USE_TECH_WORKER) + sum(b.USE_SKILL_WORKER)
+                        ) lasttotal
+                      FROM
+                        b_cp01 a,
+                        b_cp03 b
+                      WHERE
+                        a.CP0101 = b.CP0101
+                        AND b.`YEAR_MONTH` = #{lastYm}
+                      GROUP BY
+                        a.INDUSTRY
+                      ORDER BY
+                        (a.INDUSTRY + 0)
+                    ) a2,
+                    (
+                      SELECT
+                        a.INDUSTRY,
+                        count(1),
+                        (
+                          sum(b.USE_CONTROLLER) + sum(b.USE_ORD_WORKER) + sum(b.USE_TECH_WORKER) + sum(b.USE_SKILL_WORKER)
+                        ) beginyeartotal
+                      FROM
+                        b_cp01 a,
+                        b_cp03 b
+                      WHERE
+                        a.CP0101 = b.CP0101
+                        AND b.`YEAR_MONTH` = #{beginYm}
+                      GROUP BY
+                        a.INDUSTRY
+                      ORDER BY
+                        (a.INDUSTRY + 0)
+                    ) a3
+                  WHERE
+                    a1.INDUSTRY = a2.INDUSTRY
+                    AND a2.INDUSTRY = a3.INDUSTRY
+                    AND d.industryV = a1.INDUSTRY
+                  ORDER BY
+                    (a1.INDUSTRY + 0)
+                ) SELECT
+                  *
+                FROM
+                  t UNION
+                SELECT
+                  '总计',
+                  sum(cpCount),
+                  sum(nowWorkerCount),
+                  sum(preWorkerCount),
+                  sum(changeWorkerCount),
+                  sum(changeWorkerRange),
+                  sum(beginWorkerCount),
+                  sum(changeWorkerCountCompareBeginYear),
+                  sum(changeWorkerRangeCompareBeginYear)
+                FROM
+                  t;
+            </select>
+        </mapper>

@@ -1,0 +1,88 @@
+<template>
+  <SubPage>
+    <Card header="表单">
+      <CForm v-model="formData" v-loading="isFormLoading" ref="form" :configs="configsCForm" @enter="$refs.submitBtn.debounceClick()" />
+    </Card>
+    <!--固定底部-->
+    <template slot="footer">
+      <Btn :configs="{type:BTN_TYPE.back,click:goMain}"/>
+      <Btn :configs="configsBtnDebounce" ref="submitBtn"/>
+    </template>
+  </SubPage>
+</template>
+
+<script>
+import basePage from "@/mixins/basePage";
+import { mixinsSubPage, subPropCurrentView } from "@/mixins/subPage";
+import { DSLFormItems, DSLFormItemRule, MODULE_BASE_URL } from "./dsl";
+import { SuccessOrFailed, checkFormData } from '@/utils';
+import { defaultFormData } from './state';
+import { BTN_TYPE } from "@/components/Types";
+
+export default {
+  name: "${ModuleName}${PathName}Sub",
+  mixins: [basePage, mixinsSubPage, subPropCurrentView],
+  data() {
+    const handleFormSubmit = this.handleFormSubmit.bind(this);
+    return {
+      formData: { ...defaultFormData },
+      /*提交按钮*/
+      configsBtnDebounce: {
+        /*根据类型，有对应的默认text，若添加text属性，以text为准*/
+        type: BTN_TYPE.save,
+        textLoading: "正在提交...",
+        debounceClick: handleFormSubmit
+      },
+      configsCForm: {
+        DSLFormItems,
+        DSLFormItemRule
+      }
+    };
+  },
+  created() {
+    this.init();
+  },
+  methods: {
+    init() {
+      if (["update"].includes(this.currentView)) {
+        this.getInfo(this.$route.query.id);
+      }
+    },
+    // 获取表单信息
+    async getInfo(id) {
+      this.isFormLoading=true;
+      try {
+        let { data: res } = await #[[this.$http.get(]]#`#[[${]]#MODULE_BASE_URL}/#[[${]]#id}`);
+        SuccessOrFailed(
+          res,
+          {/*成功 没有msg属性则不弹出提示信息*/
+            fn: () => {this.formData = checkFormData(defaultFormData,res.data);}
+          },
+          /*失败 msg必填*/
+          { msg: res.msg }
+        );
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isFormLoading=false;
+      }
+    },
+    // 表单提交
+    async handleFormSubmit() {
+      await this.$refs["form"]?.formValidate();
+      let { data: res } = await #[[this.$http]]#[!this.formData.${pk.attrname} ? "post" : "put"](MODULE_BASE_URL, this.formData);
+      return SuccessOrFailed(
+        res,
+        {
+          msg: "表单信息已保存",
+          fn: () => {
+            #[[this.$emit]]#("refreshDataList");
+            this.goMain();
+          }
+        },
+        { msg: res.msg }
+      );
+    }
+  }
+};
+</script>

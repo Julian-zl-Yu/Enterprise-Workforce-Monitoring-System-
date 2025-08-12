@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.enterprise.bcp01.dao.BCp01Dao">
+
+    <resultMap type="io.renren.modules.enterprise.bcp01.entity.BCp01Entity" id="bCp01Map">
+        <result property="cp0101" column="CP0101"/>
+        <result property="corpcode" column="CORPCODE"/>
+        <result property="corpname" column="CORPNAME"/>
+        <result property="organizationtype" column="ORGANIZATIONTYPE"/>
+        <result property="areacode" column="AREACODE"/>
+        <result property="address" column="ADDRESS"/>
+        <result property="zipcode" column="ZIPCODE"/>
+        <result property="legalman" column="LEGALMAN"/>
+        <result property="idcardtype" column="IDCARDTYPE"/>
+        <result property="legalmanidcardnumber" column="LEGALMANIDCARDNUMBER"/>
+        <result property="regcapital" column="REGCAPITAL"/>
+        <result property="capitalcurrencytype" column="CAPITALCURRENCYTYPE"/>
+        <result property="establishdate" column="ESTABLISHDATE"/>
+        <result property="officephone" column="OFFICEPHONE"/>
+        <result property="faxnumber" column="FAXNUMBER"/>
+        <result property="linkman" column="LINKMAN"/>
+        <result property="linkphone" column="LINKPHONE"/>
+        <result property="linkcellphone" column="LINKCELLPHONE"/>
+        <result property="email" column="EMAIL"/>
+        <result property="website" column="WEBSITE"/>
+        <result property="businessstatus" column="BUSINESSSTATUS"/>
+        <result property="entscope" column="ENTSCOPE"/>
+        <result property="regdept" column="REGDEPT"/>
+        <result property="memo" column="MEMO"/>
+        <result property="creator" column="CREATOR"/>
+        <result property="createDate" column="CREATE_DATE"/>
+        <result property="updater" column="UPDATER"/>
+        <result property="updateDate" column="UPDATE_DATE"/>
+        <result property="deptId" column="DEPT_ID"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        cp0101, corpcode, corpname, organizationtype, areacode, address, zipcode, legalman, idcardtype, legalmanidcardnumber, regcapital, capitalcurrencytype, establishdate, officephone, faxnumber, linkman, linkphone, linkcellphone, email, website, businessstatus, entscope, regdept, memo, creator, create_date, updater, update_date, dept_id,estate,industry
+    </sql>
+
+    <select id="getList" resultType="io.renren.modules.enterprise.bcp01.dto.BCp01DTO">
+        select a.*
+        from B_CP01 a,
+        (select b.id
+        from sys_dept b
+        where 1=1
+        <if test="deptIdSelf==null or deptId==''">
+            and b.pids like concat('%',#{deptId},'%')
+        </if>
+        <if test="deptIdSelf!=null and deptIdSelf!=''">
+            and b.id = #{deptIdSelf}
+        </if>
+        ) c
+        where a.dept_id = c.id
+
+        <if test="corpname!=null and corpname!=''">
+            and a.corpname like '%'||#{corpname}||'%'
+        </if>
+        <if test="organizationtype!=null and organizationtype!=''">
+            and a.organizationtype=#{organizationtype}
+        </if>
+        <if test="areacode!=null and areacode!=''">
+            and a.areacode like #{areacode}||'%'
+        </if>
+        <if test="ablestatus!=null and ablestatus!=''">
+            and a.ablestatus=#{ablestatus}
+        </if>
+    </select>
+
+</mapper>

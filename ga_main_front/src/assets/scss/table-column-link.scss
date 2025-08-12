@@ -1,0 +1,15 @@
+@mixin tableColumnLink {
+    color: $color-link;
+    &:hover{
+        text-decoration: underline;
+         cursor: pointer;
+    }
+}
+
+.cell-inner-wrapper.link {
+    @include tableColumnLink;
+
+    * {
+        @include tableColumnLink;
+    }
+}

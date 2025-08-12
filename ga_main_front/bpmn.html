@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/bpmn-js@5.1.2/dist/assets/diagram-js.css" />
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/bpmn-js@5.1.2/dist/assets/bpmn-font/css/bpmn.css" />
+
+    <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+
+    <script src="https://unpkg.com/bpmn-js@5.1.2/dist/bpmn-modeler.development.js"></script>
+    <style>
+        html,
+        body,
+        #canvas {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="canvas"></div>
+    <script>
+        var modeler = new BpmnJS({
+            container: "#canvas"
+        });
+
+        var diagramUrl =
+            "https://cdn.staticaly.com/gh/bpmn-io/bpmn-js-examples/dfceecba/starter/diagram.bpmn";
+
+        $.get(
+            diagramUrl,
+            function (xml) {
+                modeler.importXML(xml, function (err) {
+                    if (!err) {
+                        console.log("success!");
+                    } else {
+                        console.log("something went wrong:", err);
+                    }
+                });
+            },
+            "text"
+        );
+    </script>
+</body>
+
+</html>
